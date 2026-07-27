@@ -133,52 +133,8 @@ Full result sets for every business question are saved as `.txt` files inside **
 
 See `output_samples/` for the complete set (monthly sales report, best-sellers, lowest-sellers, customer lifetime value, repeat customers, view outputs, etc.).
 
-## 8. Interview Questions — Answered
 
-**Q1. Difference between `WHERE` and `HAVING`?**
-`WHERE` filters individual rows *before* any grouping or aggregation happens — it cannot reference an aggregate function like `SUM()` or `COUNT()`. `HAVING` filters *groups* — it runs after `GROUP BY` has produced aggregated rows, so it can filter on aggregate results (e.g. `HAVING SUM(total_price) > 100000`). A simple rule of thumb: `WHERE` acts on raw table rows, `HAVING` acts on the summarized/grouped output.
 
-**Q2. Types of JOINs?**
-- `INNER JOIN` — returns only rows that have a match in both tables.
-- `LEFT JOIN` (LEFT OUTER JOIN) — returns all rows from the left table, plus matching rows from the right table (`NULL` where there's no match).
-- `RIGHT JOIN` (RIGHT OUTER JOIN) — mirror of LEFT JOIN; returns all rows from the right table. MySQL 8.0 supports this natively.
-- `FULL OUTER JOIN` — not natively supported in MySQL; emulated with `LEFT JOIN UNION RIGHT JOIN`.
-- `CROSS JOIN` — Cartesian product of both tables (every row combined with every row).
-- `SELF JOIN` — a table joined to itself, useful for hierarchical/comparative data.
-
-**Q3. What are Subqueries?**
-A subquery is a query nested inside another query, used wherever a single value, a list of values, or a derived table is needed. A **scalar subquery** returns a single value (e.g. `WHERE price > (SELECT AVG(price) FROM products)`). A **correlated subquery** references a column from the outer query, so it re-executes once per outer row (e.g. computing each customer's own total spend). Subqueries can appear in `SELECT`, `WHERE`, `FROM` (as a derived table), or `HAVING`.
-
-**Q4. How to calculate Average Revenue Per User (ARPU)?**
-ARPU = Total Revenue ÷ Number of Active Users (customers), typically over a defined time period (e.g. monthly ARPU). In this schema:
-```sql
-SELECT SUM(oi.total_price) / COUNT(DISTINCT o.customer_id) AS arpu
-FROM orders o
-JOIN order_items oi ON oi.order_id = o.order_id
-WHERE o.order_status <> 'Cancelled';
-```
-For a per-month ARPU, add `GROUP BY DATE_FORMAT(o.order_date,'%Y-%m')`. It's important to decide whether the denominator should be *all registered customers* or only *customers active in that period* — the two give very different numbers and should be labelled clearly in any report.
-
-**Q5. What is a View?**
-A view is a stored, named `SELECT` statement that behaves like a virtual table — it has no data of its own and is recomputed from the underlying tables every time it's queried. Views are used to: simplify repeated complex joins, present a restricted/curated set of columns to certain users (security), and give business users a stable, friendly name (`CustomerSales`) to query instead of writing raw JOINs each time.
-
-**Q6. How to optimize SQL queries?**
-- Add indexes on columns used in `JOIN` conditions, `WHERE` filters, and `ORDER BY` clauses (see Section 11 of `analysis_queries.sql`).
-- Avoid `SELECT *` — only fetch the columns you actually need.
-- Use `EXPLAIN` to check whether the optimizer is doing a full table scan vs. an index seek.
-- Filter as early as possible (push `WHERE` conditions before joins where logically valid).
-- Avoid functions on indexed columns in `WHERE` clauses (e.g. `WHERE YEAR(order_date) = 2024` prevents index use; prefer `WHERE order_date BETWEEN '2024-01-01' AND '2024-12-31'`).
-- Use `LIMIT` when only a subset of rows is needed.
-- For very large aggregations, consider covering indexes or pre-aggregated summary tables.
-
-**Q7. How to handle NULL values?**
-- Use `IS NULL` / `IS NOT NULL` for comparisons — never `= NULL`, which always evaluates to unknown.
-- Use `COALESCE(column, default_value)` to substitute a default when a value is `NULL` (used throughout this project, e.g. `COALESCE(SUM(oi.total_price),0)` so customers with zero orders show `0` instead of `NULL`).
-- Use `NULLIF(a, b)` to convert a specific value into `NULL` (useful to avoid divide-by-zero, e.g. `NULLIF(total_orders,0)`).
-- Remember aggregate functions (`SUM`, `AVG`, `COUNT(column)`) automatically ignore `NULL` values, while `COUNT(*)` counts all rows regardless.
-- Decide deliberately whether `NULL` should mean "zero/none" (usually needs `COALESCE`) or "genuinely unknown" (should stay `NULL` and be flagged, not defaulted).
-
-## 9. Learning Outcomes
 
 Through this project, the following practical skills were reinforced:
 - Designing a normalized relational schema with correct primary/foreign key constraints.
@@ -189,7 +145,7 @@ Through this project, the following practical skills were reinforced:
 - Reasoning about index selection and validating it with `EXPLAIN`.
 - Translating vague stakeholder asks ("who are our best customers?") into precise, correct SQL.
 
-## 10. Suggested Screenshots for Submission
+## 8. Suggested Screenshots for Submission
 
 Capture these in MySQL Workbench and place them in `screenshots/`:
 1. `01_database_creation.png` — Result of running `ecommerce_database.sql` (Output/Action log showing success, no errors).
@@ -203,7 +159,7 @@ Capture these in MySQL Workbench and place them in `screenshots/`:
 9. `09_explain_index.png` — Output of an `EXPLAIN` statement showing the index being used (`key` column populated, not `NULL`).
 10. `10_er_diagram.png` — The `schema.png` ER diagram itself (or a screenshot of Workbench's own reverse-engineered EER diagram, if generated).
 
-## 11. Project Structure
+## 9. Project Structure
 
 ```
 Task3_SQL_Data_Analysis/
@@ -218,5 +174,5 @@ Task3_SQL_Data_Analysis/
 
 ---
 
-**Author:** Data Analyst / SQL Developer — Task 3 Internship Submission
+**Author:** Aiman zuha — Task 3 Internship Submission
 **Database engine:** MySQL 8.0.46
