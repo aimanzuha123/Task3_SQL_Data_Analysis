@@ -895,3 +895,4 @@ INSERT INTO payments (order_id, payment_date, payment_method, amount, payment_st
 -- Next step: run analysis_queries.sql for the full data-analysis query suite,
 -- covering joins, subqueries, window functions, CTEs, views and indexes.
 -- =====================================================================================
+
